@@ -1,0 +1,45 @@
+version: "3.6"
+services:
+
+  backend:
+    restart: always
+    container_name: backend
+    build: .
+    ports:
+      - "8080:8081"
+    environment:
+      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000 -Xmx1g -Xms1g -XX:MaxDirectMemorySize=200m -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints"
+      TZ: "UTC"
+      EUREKA_HOSTNAME: "eureka"
+      SPRING_PROFILES_ACTIVE: "dev"
+    depends_on:
+      - mongo
+
+  mongo:
+    restart: always
+    image: mongo:6.0.3
+    container_name: mongo
+    #command: "/usr/bin/mongod --bind_ip_all --replSet rs" # startup container in replicaset with name 'rs' mode
+    ports:
+      - "27017:27017"
+    #    healthcheck: # command to initiate replicaset with name 'rs' and register container as primary node in it
+    #      test: |
+    #        test $$(mongosh --quiet --eval "try { rs.initiate({ _id: 'rs', members: [{ _id: 0, host: 'localhost' }] }).ok } catch (_) { rs.status().ok }") -eq 1
+    #      interval: 5s
+    volumes:
+      - ./data/mongo:/data/db
+
+  redis:
+    restart: always
+    container_name: redis
+    image: redis:6.0.3
+    ports:
+      - "6379:6379"
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./data/redis:/data
+      - ./data/redis.conf:/usr/local/etc/redis/redis.conf
+
+networks:
+  default:
+    name: todo_network

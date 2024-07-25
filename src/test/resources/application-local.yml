@@ -1,0 +1,41 @@
+spring:
+  #  mvc:
+  #    servlet:
+  #      path: /api
+  spring:
+    config:
+      activate:
+        on-profile: local
+    spring:
+      profiles:
+        active: local
+  application:
+    name: auth
+  session:
+    store-type: redis
+    redis:
+      flush-mode: on_save
+      namespace: spring:session
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/auth
+    redis:
+      host: localhost
+      password: ""
+      port: 6379
+springdoc:
+  api-docs:
+    path: /v1/api-docs/auth
+  swagger-ui:
+    path: /auth/swagger-ui.html
+server:
+  port: 8081
+openapi:
+  service:
+    title: auth doc #title that you will want to display in the swagger ui
+    version: 1.0.0
+    url: http://localhost:8081 #api gateway url
+
+token:
+  signing:
+    key: 413F4428472B4B6250655368566D5970337336763979244226452948404D6351
